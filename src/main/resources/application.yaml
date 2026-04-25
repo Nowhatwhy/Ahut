@@ -1,3 +1,19 @@
 spring:
   application:
     name: Ahut
+  profiles:
+    active: local
+  datasource:
+    url: jdbc:mysql://localhost:3306/ahut?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+ahut:
+  LOGIN_URL: "https://pay.ahut.edu.cn/Account/LoginService"
+  LOGIN_PAGE_URL: "https://pay.ahut.edu.cn/Account/Login"
+  VERIFY_URL: "https://pay.ahut.edu.cn/Account/VerifyCode"
+  CHARGE_URL: "https://pay.ahut.edu.cn/Charge/GetIMS_AHUTService"
+  PUBLIC_KEY: "MIIBITANBgkqhkiG9w0BAQEFAAOCAQ4AMIIBCQKCAQBwpjFh5e65q6X/L3aRYGLsD2+jvGlzcQ/gwyeZSx/vvbLKf/OcqoUxWst6I8FVfChflFKrWpz2K9GWTeE+be1FSD83abG0TXE6xL7UX6+gbkU+1KfcbZjI8KOx4NJkY2+NG8CQ0g/MrEnYs1lA2j5b84byjPrLycoDg5Ia6yIpad5xFmRLJkwCZB4HdhvpPxDvrR6QtIhz5Q0qM2dSdXeMO11FidTZ9C3bARZ+CqysBTr77Z2NaOhUwSBvvZt/jpbkErSe9Fbv5efH7mVK+w9qPU/zYkUHKFzd1LVlbm1UQMeKCLwHtMyxMHugiOORT7J1hCFeVfU1/UlmSdEFNFK/AgMBAAE="
+  USER_AGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+  USERNAME: ${AHUT_USERNAME}
+  PASSWORD: ${AHUT_PASSWORD}
