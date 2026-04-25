@@ -3,7 +3,11 @@ package org.nowhatwhy.ahut.dto;
 import lombok.Data;
 
 @Data
-public class ChargeDTO {
+public class UserDTO {
+    private String username;
+
+    private String password;
+
     private String campus;
 
     private String buildingName;
@@ -11,6 +15,4 @@ public class ChargeDTO {
     private String buildingId;
 
     private String roomNo;
-
-    private String electricityType;
 }

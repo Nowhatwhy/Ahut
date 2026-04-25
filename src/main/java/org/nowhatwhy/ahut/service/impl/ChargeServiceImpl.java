@@ -1,10 +1,12 @@
 package org.nowhatwhy.ahut.service.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.nowhatwhy.ahut.dto.ChargeDTO;
+import org.nowhatwhy.ahut.enitity.Building;
 import org.nowhatwhy.ahut.enitity.Charge;
 import org.nowhatwhy.ahut.service.ChargeService;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +20,7 @@ import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -36,58 +39,16 @@ public class ChargeServiceImpl implements ChargeService {
     private String userAgent;
     @Value("${ahut.CHARGE_URL}")
     private String chargeUrl;
+    @Value("${ahut.BUILDINGS_URL}")
+    private String buildingsUrl;
     @Override
     public Charge queryCharge(ChargeDTO chargeDTO) {
-        CookieManager cookieManager = new CookieManager();
-        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
-
-        OkHttpClient client = new OkHttpClient.Builder()
-                .cookieJar(new JavaNetCookieJar(cookieManager))
-                .build();
-        Request request = new Request.Builder()
-                .url(loginPageUrl)
-                .header("User-Agent", userAgent)
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .header("Referer", loginPageUrl)
-                .header("Origin", "https://pay.ahut.edu.cn")
-                .get()
-                .build();
+        OkHttpClient client = login();
         try {
-            client.newCall(request).execute();
-            log.info("开始获取登录页面");
-
-            Request request1 = new Request.Builder()
-                    .url(loginUrl)
-                    .header("User-Agent", userAgent)
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .header("Referer", loginPageUrl)
-                    .header("Origin", "https://pay.ahut.edu.cn")
-                    .post(new FormBody.Builder()
-                            .add("username", userName)
-                            .add("pwd", encryptPassword(passWord))
-                            .build())
-                    .build();
-            try (Response response1 = client.newCall(request1).execute()){
-                String body = response1.body() == null ? "" : response1.body().string();
-                if (!response1.isSuccessful()) {
-                    throw new RuntimeException("登录请求失败，HTTP状态码：" + response1.code());
-                }
-
-                JSONObject json = JSON.parseObject(body);
-                Integer code = json.getInteger("Code");
-                if (code == null || code != 0) {
-                    String msg = json.getString("Msg");
-                    throw new RuntimeException("登录失败：" + msg);
-                }
-            }
-            log.info("登录成功");
             log.info("开始查询电费");
             Request request2 = new Request.Builder()
                     .url(chargeUrl)
                     .header("User-Agent", userAgent)
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .header("Referer", loginPageUrl)
-                    .header("Origin", "https://pay.ahut.edu.cn")
                     .post(new FormBody.Builder()
                             .add("xiaoqu", chargeDTO.getCampus())
                             .add("ld_Name", chargeDTO.getBuildingName())
@@ -107,8 +68,8 @@ public class ChargeServiceImpl implements ChargeService {
                     String msg = json.getString("Msg");
                     throw new RuntimeException("查询电费失败：" + msg);
                 }
-                log.info("查询电费成功: {}", json.getJSONObject("Data"));
                 JSONObject data = json.getJSONObject("Data");
+                log.info("查询电费成功: {}", data);
                 Charge charge = new Charge();
                 charge.setRoomId(data.getString("room_id"));
                 charge.setAllBalance(data.getDouble("AllAmp"));
@@ -121,6 +82,106 @@ public class ChargeServiceImpl implements ChargeService {
             throw new RuntimeException("查询电费失败: "+e.getMessage(), e);
         }
     }
+
+    @Override
+    public List<Building> queryBuildings(String name) {
+        OkHttpClient client = login();
+        try {
+            log.info("开始查询宿舍");
+            Request request = new Request.Builder()
+                    .url(buildingsUrl)
+                    .header("User-Agent", userAgent)
+                    .post(new FormBody.Builder()
+                            .add("xiaoqu", name)
+                            .build())
+                    .build();
+            try (Response response = client.newCall(request).execute()) {
+                String body = response.body() == null ? "" : response.body().string();
+                if (!response.isSuccessful()) {
+                    throw new RuntimeException("查询宿舍请求失败，HTTP状态码：" + response.code());
+                }
+                JSONObject json = JSON.parseObject(body);
+                Integer code = json.getInteger("Code");
+                if (code == null || code != 0) {
+                    String msg = json.getString("Msg");
+                    throw new RuntimeException("查询宿舍失败：" + msg);
+                }
+                log.info("查询宿舍成功: {}", json);
+                JSONArray data = json.getJSONArray("Data");
+                return data.stream().map(item -> {
+                    JSONObject jsonObject = (JSONObject) item;
+                    Building building = new Building();
+                    building.setBuildingId(jsonObject.getString("Id"));
+                    building.setBuildingName(jsonObject.getString("Name"));
+                    return building;
+                }).toList();
+            }
+        } catch (Exception e) {
+            log.error("查询宿舍失败", e);
+            throw new RuntimeException("查询宿舍失败: "+e.getMessage(),e);
+        }
+    }
+    private OkHttpClient login() {
+        log.info("开始登录");
+        try {
+            Thread.sleep(1000);
+            CookieManager cookieManager = new CookieManager();
+            cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .cookieJar(new JavaNetCookieJar(cookieManager))
+                    .build();
+
+            // 1.访问登录页
+            Request request = new Request.Builder()
+                    .url(loginPageUrl)
+                    .header("User-Agent", userAgent)
+                    .header("Referer", loginPageUrl)
+                    .header("Origin", "https://pay.ahut.edu.cn")
+                    .get()
+                    .build();
+
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    throw new RuntimeException("登录页面请求失败");
+                }
+            }
+
+            // 2.登录
+            Request request1 = new Request.Builder()
+                    .url(loginUrl)
+                    .header("User-Agent", userAgent)
+                    .header("Referer", loginPageUrl)
+                    .header("Origin", "https://pay.ahut.edu.cn")
+                    .post(new FormBody.Builder()
+                            .add("username", userName)
+                            .add("pwd", encryptPassword(passWord))
+                            .build())
+                    .build();
+
+            try (Response response1 = client.newCall(request1).execute()) {
+                String body = response1.body() == null ? "" : response1.body().string();
+
+                if (!response1.isSuccessful()) {
+                    throw new RuntimeException("登录请求失败");
+                }
+
+                JSONObject json = JSON.parseObject(body);
+                Integer code = json.getInteger("Code");
+
+                if (code == null || code != 0) {
+                    throw new RuntimeException("登录失败：" + json.getString("Msg"));
+                }
+            }
+
+            log.info("登录成功");
+            return client;
+
+        } catch (Exception e) {
+            throw new RuntimeException("登录流程失败", e);
+        }
+    }
+
     private String encryptPassword(String password) throws Exception {
         // 1. 先 Base64 编码密码
         String base64Pwd = Base64.getEncoder()
