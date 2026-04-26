@@ -11,6 +11,8 @@ public class User {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String qq;
+
     private String username;
 
     private String password;
@@ -24,8 +26,8 @@ public class User {
     private String roomNo;
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createdTime;
+    private LocalDateTime createTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatedTime;
+    private LocalDateTime updateTime;
 }

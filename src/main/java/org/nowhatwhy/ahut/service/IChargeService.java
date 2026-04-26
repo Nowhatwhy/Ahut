@@ -6,7 +6,7 @@ import org.nowhatwhy.ahut.enitity.Charge;
 
 import java.util.List;
 
-public interface ChargeService {
+public interface IChargeService {
     Charge queryCharge(ChargeDTO chargeDTO);
 
     List<Building> queryBuildings(String name);

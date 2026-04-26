@@ -5,10 +5,12 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.nowhatwhy.ahut.constant.ErrorCode;
 import org.nowhatwhy.ahut.dto.ChargeDTO;
 import org.nowhatwhy.ahut.enitity.Building;
 import org.nowhatwhy.ahut.enitity.Charge;
-import org.nowhatwhy.ahut.service.ChargeService;
+import org.nowhatwhy.ahut.expection.BusinessException;
+import org.nowhatwhy.ahut.service.IChargeService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +26,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class ChargeServiceImpl implements ChargeService {
+public class ChargeServiceImpl implements IChargeService {
     @Value("${ahut.LOGIN_URL}")
     private String loginUrl;
     @Value("${ahut.LOGIN_PAGE_URL}")
@@ -79,7 +81,7 @@ public class ChargeServiceImpl implements ChargeService {
             }
         } catch (Exception e) {
             log.error("查询电费失败", e);
-            throw new RuntimeException("查询电费失败: "+e.getMessage(), e);
+            throw new BusinessException(ErrorCode.CHARGE_QUERY_FAIL, e.getMessage());
         }
     }
 
@@ -118,7 +120,7 @@ public class ChargeServiceImpl implements ChargeService {
             }
         } catch (Exception e) {
             log.error("查询宿舍失败", e);
-            throw new RuntimeException("查询宿舍失败: "+e.getMessage(),e);
+            throw new BusinessException(ErrorCode.BUILDING_INFO_ERROR, e.getMessage());
         }
     }
     private OkHttpClient login() {
@@ -178,7 +180,7 @@ public class ChargeServiceImpl implements ChargeService {
             return client;
 
         } catch (Exception e) {
-            throw new RuntimeException("登录流程失败", e);
+            throw new BusinessException(ErrorCode.CAPTCHA_ERROR, e.getMessage());
         }
     }
 
