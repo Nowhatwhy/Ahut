@@ -19,13 +19,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/charge")
 public class ChargeController {
-    private final IChargeService IChargeService;
+    private final IChargeService chargeService;
     @GetMapping("/charge")
     public Result<Charge> queryCharge(ChargeDTO chargeDTO) {
-        return Result.ok(IChargeService.queryCharge(chargeDTO));
+        return Result.ok(chargeService.queryCharge(chargeDTO));
     }
     @GetMapping("/buildings/{name}")
     public Result<List<Building>> queryBuildings(@PathVariable String name) {
-        return Result.ok(IChargeService.queryBuildings(name));
+        return Result.ok(chargeService.queryBuildings(name));
     }
 }

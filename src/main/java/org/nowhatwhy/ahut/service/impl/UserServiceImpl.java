@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.nowhatwhy.ahut.constant.ErrorCode;
 import org.nowhatwhy.ahut.constant.UserConstant;
 import org.nowhatwhy.ahut.dto.UserDTO;
+import org.nowhatwhy.ahut.dto.UserTokenDTO;
+import org.nowhatwhy.ahut.dto.UserUpdateDTO;
 import org.nowhatwhy.ahut.enitity.User;
 import org.nowhatwhy.ahut.expection.BusinessException;
 import org.nowhatwhy.ahut.mapper.UserMapper;
@@ -57,7 +59,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new BusinessException(ErrorCode.PASSWORD_ERROR, "密码错误");
         }
         log.info("用户信息: {}", user);
-        Map<String, Object> userMap = BeanUtil.beanToMap(userDTO, new HashMap<>(), CopyOptions.create()
+        UserTokenDTO userTokenDTO = new UserTokenDTO();
+        BeanUtil.copyProperties(user, userTokenDTO);
+        Map<String, Object> userMap = BeanUtil.beanToMap(userTokenDTO, new HashMap<>(), CopyOptions.create()
                 .setIgnoreNullValue(true)
                 .setFieldValueEditor((filedKey, filedValue) -> filedValue.toString()));
         String token = UUID.randomUUID().toString();
@@ -78,5 +82,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         stringRedisTemplate.opsForValue().set(UserConstant.CAPTCHA_CODE_KEY + qq, code, UserConstant.CAPTCHA_CODE_TTL, TimeUnit.SECONDS);
         log.info("qq: {}，验证码: {}", qq, code);
         // TODO 请求qq bot后端发送验证码
+    }
+
+    @Override
+    public void updateUser(UserUpdateDTO userUpdateDTO) {
+        User user = BeanUtil.copyProperties(userUpdateDTO, User.class);
+        save(user);
+        log.info("用户信息更新成功，用户信息: {}", user);
     }
 }

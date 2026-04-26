@@ -7,6 +7,4 @@ public class UserTokenDTO {
     private Long id;
 
     private String qq;
-
-    private String username;
 }

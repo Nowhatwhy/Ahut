@@ -3,26 +3,29 @@ package org.nowhatwhy.ahut.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nowhatwhy.ahut.dto.UserDTO;
+import org.nowhatwhy.ahut.dto.UserUpdateDTO;
 import org.nowhatwhy.ahut.enitity.Result;
 import org.nowhatwhy.ahut.service.IUserService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    private final IUserService IUserService;
+    private final IUserService userService;
     @PostMapping("/login")
     public Result<String> login(@RequestBody UserDTO userDTO) {
-        return Result.ok(IUserService.login(userDTO));
+        return Result.ok(userService.login(userDTO));
     }
     @PostMapping("/sendCode")
     public Result<?> sendCode(String qq) {
-        IUserService.sendCode(qq);
+        userService.sendCode(qq);
+        return Result.ok();
+    }
+    @PutMapping("/update")
+    public Result<?> update(@RequestBody UserUpdateDTO userUpdateDTO) {
+        userService.updateUser(userUpdateDTO);
         return Result.ok();
     }
 }
