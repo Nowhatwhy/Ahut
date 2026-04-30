@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nowhatwhy.ahut.mapper.UserBindingMapper">
+    <select id="listUserBindings" resultType="org.nowhatwhy.ahut.vo.UserBindingVO">
+        SELECT b.id AS bindingId,
+               d.room_no,
+               d.electricity_type,
+               bu.building_name
+        FROM user_binding b
+                 JOIN dorm d ON b.dorm_id = d.id
+                 JOIN building bu ON d.building_pk = bu.id
+        WHERE b.user_id = #{userId}
+    </select>
+</mapper>

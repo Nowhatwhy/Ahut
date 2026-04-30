@@ -2,7 +2,6 @@ package org.nowhatwhy.ahut.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.nowhatwhy.ahut.dto.BindingDormDTO;
 import org.nowhatwhy.ahut.dto.UserDTO;
 import org.nowhatwhy.ahut.dto.UserUpdateDTO;
 import org.nowhatwhy.ahut.entity.Result;
@@ -31,11 +30,6 @@ public class UserController {
     @PutMapping("/update")
     public Result<?> update(@RequestBody UserUpdateDTO userUpdateDTO) {
         userService.updateUser(userUpdateDTO);
-        return Result.ok();
-    }
-    @PostMapping("bindDorm")
-    public Result<?> bindDorm(@RequestBody BindingDormDTO bindingDormDTO) {
-        userService.bindDorm(bindingDormDTO);
         return Result.ok();
     }
 }

@@ -18,7 +18,7 @@ public class GlobalExceptionHandler{
     }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Result<?>> handle(Exception e) {
-        log.error(e.toString());
+        log.error("系统异常", e);
         return ResponseEntity
                 .status(500)
                 .body(Result.fail(ErrorCode.SYSTEM_ERROR, "系统异常"));

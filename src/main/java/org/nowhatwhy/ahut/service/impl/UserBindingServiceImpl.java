@@ -14,10 +14,14 @@ import org.nowhatwhy.ahut.mapper.UserBindingMapper;
 import org.nowhatwhy.ahut.service.IBuildingService;
 import org.nowhatwhy.ahut.service.IDormService;
 import org.nowhatwhy.ahut.service.IUserBindingService;
+import org.nowhatwhy.ahut.utils.UserHolder;
+import org.nowhatwhy.ahut.vo.UserBindingVO;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,7 +30,9 @@ public class UserBindingServiceImpl extends ServiceImpl<UserBindingMapper, UserB
     private final IDormService dormService;
     private final IBuildingService buildingService;
     private final RedissonClient redissonClient;
-    public void bind(Long userId, BindingDormDTO bindingDormDTO) {
+    private final UserBindingMapper userBindingMapper;
+    public void saveBinding(BindingDormDTO bindingDormDTO) {
+        Long userId = UserHolder.get().getId();
         // 1.检查buildingPk是否存在
         Long buildingPk = bindingDormDTO.getBuildingPk();
         if (!buildingService.lambdaQuery().eq(Building::getId, buildingPk).exists()) {
@@ -65,11 +71,6 @@ public class UserBindingServiceImpl extends ServiceImpl<UserBindingMapper, UserB
             throw new BusinessException("请勿频繁提交");
         }
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e){
-
-        }
-        try {
             if (lambdaQuery()
                     .eq(UserBinding::getUserId, userId)
                     .eq(UserBinding::getDormId, dorm.getId())
@@ -88,5 +89,11 @@ public class UserBindingServiceImpl extends ServiceImpl<UserBindingMapper, UserB
                 lock.unlock();
             }
         }
+        return;
+    }
+
+    @Override
+    public List<UserBindingVO> listBindings() {
+        return userBindingMapper.listUserBindings(UserHolder.get().getId());
     }
 }

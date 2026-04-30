@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nowhatwhy.ahut.constant.ErrorCode;
 import org.nowhatwhy.ahut.constant.RedisConstant;
-import org.nowhatwhy.ahut.dto.BindingDormDTO;
 import org.nowhatwhy.ahut.dto.UserDTO;
 import org.nowhatwhy.ahut.dto.UserTokenDTO;
 import org.nowhatwhy.ahut.dto.UserUpdateDTO;
@@ -66,7 +65,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         Map<String, Object> userMap = BeanUtil.beanToMap(userTokenDTO, new HashMap<>(), CopyOptions.create()
                 .setIgnoreNullValue(true)
                 .setFieldValueEditor((filedKey, filedValue) -> filedValue.toString()));
-        String token = UUID.randomUUID().toString();
+          String token = UUID.randomUUID().toString();
         stringRedisTemplate.opsForHash().putAll(RedisConstant.LOGIN_TOKEN + token, userMap);
         stringRedisTemplate.expire(RedisConstant.LOGIN_TOKEN + token, RedisConstant.LOGIN_TOKEN_TTL, TimeUnit.SECONDS);
         log.info("用户登录成功，token: {}", token);
@@ -94,11 +93,5 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         user.setId(UserHolder.get().getId());
         lambdaUpdate().update(user);
         log.info("用户: {} 信息更新成功", UserHolder.get());
-    }
-
-    @Override
-    public void bindDorm(BindingDormDTO bindingDormDTO) {
-        Long userId = UserHolder.get().getId();
-        userBindingService.bind(userId, bindingDormDTO);
     }
 }

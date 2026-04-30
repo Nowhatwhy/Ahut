@@ -9,9 +9,12 @@ spring:
     password: ${DB_PASSWORD}
   data:
     redis:
-      host: localhost
+      host: 127.0.0.1
       port: 6379
       database: 0
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
 
 ahut:
   LOGIN_URL: "https://pay.ahut.edu.cn/Account/LoginService"
