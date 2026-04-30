@@ -1,4 +1,4 @@
-package org.nowhatwhy.ahut.enitity;
+package org.nowhatwhy.ahut.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
@@ -16,14 +16,6 @@ public class User {
     private String username;
 
     private String password;
-
-    private String campus;
-
-    private String buildingName;
-
-    private String buildingId;
-
-    private String roomNo;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

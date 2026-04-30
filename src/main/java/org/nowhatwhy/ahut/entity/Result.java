@@ -1,4 +1,4 @@
-package org.nowhatwhy.ahut.enitity;
+package org.nowhatwhy.ahut.entity;
 
 import lombok.Data;
 
@@ -13,7 +13,7 @@ public class Result<T> {
     public static <T> Result<T> ok(T data) {
         Result<T> result = new Result<>();
         result.setCode(0);
-        result.setMessage("success");
+        result.setMessage("");
         result.setData(data);
         return result;
     }

@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.nowhatwhy.ahut.constant.UserConstant;
+import org.nowhatwhy.ahut.constant.RedisConstant;
 import org.nowhatwhy.ahut.dto.UserTokenDTO;
 import org.nowhatwhy.ahut.utils.UserHolder;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -29,7 +29,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             log.info("用户未登录");
             return false;
         }
-        String key = UserConstant.LOGIN_TOKEN + token;
+        String key = RedisConstant.LOGIN_TOKEN + token;
         if (!stringRedisTemplate.hasKey(key)) {
             response.setStatus(401);
             response.setContentType("text/plain;charset=utf-8");
@@ -46,7 +46,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         return true;
     }
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception ex) throws Exception {
         UserHolder.remove();
     }
 }

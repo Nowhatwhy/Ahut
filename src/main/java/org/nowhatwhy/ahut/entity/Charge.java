@@ -1,4 +1,4 @@
-package org.nowhatwhy.ahut.enitity;
+package org.nowhatwhy.ahut.entity;
 
 import lombok.Data;
 

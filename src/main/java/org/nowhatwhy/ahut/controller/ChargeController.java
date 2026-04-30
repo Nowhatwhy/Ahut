@@ -3,17 +3,19 @@ package org.nowhatwhy.ahut.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nowhatwhy.ahut.dto.ChargeDTO;
-import org.nowhatwhy.ahut.enitity.Building;
-import org.nowhatwhy.ahut.enitity.Charge;
-import org.nowhatwhy.ahut.enitity.Result;
+import org.nowhatwhy.ahut.entity.Building;
+import org.nowhatwhy.ahut.entity.Charge;
+import org.nowhatwhy.ahut.entity.Result;
 import org.nowhatwhy.ahut.service.IChargeService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 电费
+ * @author nowhatwhy
+ **/
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -21,7 +23,7 @@ import java.util.List;
 public class ChargeController {
     private final IChargeService chargeService;
     @GetMapping("/charge")
-    public Result<Charge> queryCharge(ChargeDTO chargeDTO) {
+    public Result<Charge> queryCharge(@Validated ChargeDTO chargeDTO) {
         return Result.ok(chargeService.queryCharge(chargeDTO));
     }
     @GetMapping("/buildings/{name}")

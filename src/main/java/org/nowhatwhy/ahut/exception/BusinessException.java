@@ -1,4 +1,4 @@
-package org.nowhatwhy.ahut.expection;
+package org.nowhatwhy.ahut.exception;
 
 import lombok.Getter;
 import org.nowhatwhy.ahut.constant.ErrorCode;

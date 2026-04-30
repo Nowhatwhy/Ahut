@@ -2,12 +2,17 @@ package org.nowhatwhy.ahut.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.nowhatwhy.ahut.dto.BindingDormDTO;
 import org.nowhatwhy.ahut.dto.UserDTO;
 import org.nowhatwhy.ahut.dto.UserUpdateDTO;
-import org.nowhatwhy.ahut.enitity.Result;
+import org.nowhatwhy.ahut.entity.Result;
 import org.nowhatwhy.ahut.service.IUserService;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 用户
+ * @author nowhatwhy
+ */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -26,6 +31,11 @@ public class UserController {
     @PutMapping("/update")
     public Result<?> update(@RequestBody UserUpdateDTO userUpdateDTO) {
         userService.updateUser(userUpdateDTO);
+        return Result.ok();
+    }
+    @PostMapping("bindDorm")
+    public Result<?> bindDorm(@RequestBody BindingDormDTO bindingDormDTO) {
+        userService.bindDorm(bindingDormDTO);
         return Result.ok();
     }
 }

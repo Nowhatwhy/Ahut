@@ -26,6 +26,12 @@ public class ErrorCode {
     public static final int CHARGE_QUERY_FAIL = 4001;
 
     public static final int BUILDING_INFO_ERROR = 4002;
+
+    public static final int LOGIN_FAILED = 40003;
+
+    public static final int DORM_EXIST = 40004;
+
+    public static final int SYSTEM_ERROR = 50001;
 }
 
 /*

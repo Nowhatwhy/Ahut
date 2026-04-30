@@ -2,10 +2,8 @@ package org.nowhatwhy.ahut.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import org.nowhatwhy.ahut.entity.User;
-
+import org.nowhatwhy.ahut.entity.Dorm;
 
 @Mapper
-public interface UserMapper extends BaseMapper<User> {
-
+public interface DormMapper extends BaseMapper<Dorm> {
 }

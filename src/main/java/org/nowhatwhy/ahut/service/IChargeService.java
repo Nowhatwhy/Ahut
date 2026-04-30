@@ -1,8 +1,8 @@
 package org.nowhatwhy.ahut.service;
 
 import org.nowhatwhy.ahut.dto.ChargeDTO;
-import org.nowhatwhy.ahut.enitity.Building;
-import org.nowhatwhy.ahut.enitity.Charge;
+import org.nowhatwhy.ahut.entity.Building;
+import org.nowhatwhy.ahut.entity.Charge;
 
 import java.util.List;
 

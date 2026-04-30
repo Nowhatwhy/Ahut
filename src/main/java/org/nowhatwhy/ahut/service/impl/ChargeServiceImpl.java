@@ -7,9 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.nowhatwhy.ahut.constant.ErrorCode;
 import org.nowhatwhy.ahut.dto.ChargeDTO;
-import org.nowhatwhy.ahut.enitity.Building;
-import org.nowhatwhy.ahut.enitity.Charge;
-import org.nowhatwhy.ahut.expection.BusinessException;
+import org.nowhatwhy.ahut.entity.Building;
+import org.nowhatwhy.ahut.entity.Charge;
+import org.nowhatwhy.ahut.exception.BusinessException;
 import org.nowhatwhy.ahut.service.IChargeService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -172,7 +172,7 @@ public class ChargeServiceImpl implements IChargeService {
                 Integer code = json.getInteger("Code");
 
                 if (code == null || code != 0) {
-                    throw new RuntimeException("登录失败：" + json.getString("Msg"));
+                    throw new RuntimeException(json.getString("Msg"));
                 }
             }
 
@@ -180,7 +180,8 @@ public class ChargeServiceImpl implements IChargeService {
             return client;
 
         } catch (Exception e) {
-            throw new BusinessException(ErrorCode.CAPTCHA_ERROR, e.getMessage());
+            log.error("登录失败", e);
+            throw new BusinessException(ErrorCode.LOGIN_FAILED, "登录失败：" + e.getMessage());
         }
     }
 
