@@ -93,4 +93,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         lambdaUpdate().update(user);
         log.info("用户: {} 信息更新成功", UserHolder.get());
     }
+
+    @Override
+    public User getUserByQQ(String qq) {
+        return lambdaQuery().eq(User::getQq, qq).one();
+    }
 }

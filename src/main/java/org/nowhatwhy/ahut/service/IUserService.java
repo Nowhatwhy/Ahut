@@ -11,4 +11,6 @@ public interface IUserService extends IService<User> {
     void sendCode(String qq);
 
     void updateUser(UserUpdateDTO userUpdateDTO);
+
+    User getUserByQQ(String qq);
 }

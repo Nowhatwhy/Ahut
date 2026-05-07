@@ -1,5 +1,6 @@
 package org.nowhatwhy.ahut.Interceptor;
 
+import cn.hutool.core.bean.BeanUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.nowhatwhy.ahut.constant.RedisConstant;
 import org.nowhatwhy.ahut.dto.UserTokenDTO;
+import org.nowhatwhy.ahut.entity.User;
+import org.nowhatwhy.ahut.service.IUserService;
 import org.nowhatwhy.ahut.utils.UserHolder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -18,17 +22,32 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
+    @Value("${BOT_SECRET}")
+    private String botSecret;
     private final StringRedisTemplate stringRedisTemplate;
+    private final IUserService userService;
     @Override
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
-        String token = request.getHeader("token");
-        if (token == null || token.isBlank()) {
+        String botSecret = request.getHeader("bot-secret");
+        if (botSecret != null && botSecret.equals(this.botSecret)) {
+            log.info("Bot 验证成功");
+            String qq = request.getHeader("qq");
+            User user = userService.getUserByQQ(qq);
+            if (user == null) {
+                return false;
+            }
+            UserHolder.save(BeanUtil.copyProperties(user, UserTokenDTO.class));
+            return true;
+        }
+        String token = request.getHeader("Authorization");
+        if (token == null || !token.startsWith("Bearer ")) {
             response.setStatus(401);
             response.setContentType("text/plain;charset=utf-8");
             response.getWriter().write("用户未登录");
             log.info("用户未登录");
             return false;
         }
+        token = token.substring(7);
         String key = RedisConstant.LOGIN_TOKEN + token;
         if (!stringRedisTemplate.hasKey(key)) {
             response.setStatus(401);
