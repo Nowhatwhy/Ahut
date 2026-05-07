@@ -7,7 +7,8 @@
         SELECT b.id AS bindingId,
                d.room_no,
                d.electricity_type,
-               bu.building_name
+               bu.building_name,
+               bu.campus
         FROM user_binding b
                  JOIN dorm d ON b.dorm_id = d.id
                  JOIN building bu ON d.building_pk = bu.id

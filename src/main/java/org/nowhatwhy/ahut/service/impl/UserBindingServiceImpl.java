@@ -89,7 +89,17 @@ public class UserBindingServiceImpl extends ServiceImpl<UserBindingMapper, UserB
                 lock.unlock();
             }
         }
-        return;
+    }
+
+    @Override
+    public void deleteBindingsByIds(List<Long> ids) {
+        Long userId = UserHolder.get().getId();
+        if (lambdaQuery().in(UserBinding::getId, ids).eq(UserBinding::getUserId, userId).count() != ids.size()) {
+            log.warn("无权限删除");
+            throw new BusinessException("无权限删除");
+        }
+        removeByIds(ids);
+        log.info("用户: {} 删除绑定成功", userId);
     }
 
     @Override

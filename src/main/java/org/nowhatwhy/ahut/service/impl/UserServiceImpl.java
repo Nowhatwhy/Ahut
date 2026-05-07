@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
     private final StringRedisTemplate stringRedisTemplate;
-    private final UserBindingServiceImpl userBindingService;
     @Override
     public String login(UserDTO userDTO) {
         log.info("开始验证验证码，用户信息: {}", userDTO);

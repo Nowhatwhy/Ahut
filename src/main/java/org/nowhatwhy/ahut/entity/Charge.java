@@ -2,13 +2,17 @@ package org.nowhatwhy.ahut.entity;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class Charge {
+    private Long dormId;
+
     private String roomId;
 
-    private Double remainingBalance;
+    private BigDecimal remainingBalance;
 
-    private Double allBalance;
+    private BigDecimal allBalance;
 
-    private Double usedBalance;
+    private BigDecimal usedBalance;
 }

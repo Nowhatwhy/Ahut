@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nowhatwhy.ahut.mapper.ChargeRecordMapper">
+    <select id="listChargeDTO" resultType="org.nowhatwhy.ahut.dto.ChargeDTO">
+        SELECT
+            d.id AS dormId,
+            bu.campus,
+            bu.building_id,
+            d.room_no,
+            d.electricity_type
+            FROM dorm d
+            JOIN building bu ON bu.id = d.building_pk
+        WHERE EXISTS(SELECT
+                         1
+                     FROM user_binding ub
+                     WHERE ub.dorm_id = d.id)
+    </select>
+    <insert id="saveChargeRecords">
+        INSERT INTO charge_record (dorm_id, balance, record_date) VALUES
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.dormId}, #{item.balance}, #{item.recordDate})
+        </foreach>
+    </insert>
+    <select id="listChargeRecords" resultType="org.nowhatwhy.ahut.vo.ChargeRecordVO">
+        SELECT
+                cr.dorm_id,
+                cr.balance,
+                b.campus ,
+                b.building_name,
+                d.room_no,
+                d.electricity_type,
+                cr.create_time
+            FROM user_binding ub
+            JOIN dorm d ON d.id = ub.dorm_id
+            JOIN charge_record cr ON cr.dorm_id = d.id
+            JOIN building b ON d.building_pk = b.id
+        WHERE user_id = #{userId}
+        ORDER BY cr.create_time DESC
+        LIMIT 10
+    </select>
+</mapper>

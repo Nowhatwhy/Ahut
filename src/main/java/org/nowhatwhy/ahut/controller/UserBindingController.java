@@ -30,4 +30,9 @@ public class UserBindingController {
         userBindingService.saveBinding(bindingDormDTO);
         return Result.ok();
     }
+    @DeleteMapping
+    public Result<Void> deleteBinding(@RequestBody List<Long> ids) {
+        userBindingService.deleteBindingsByIds(ids);
+        return Result.ok();
+    }
 }

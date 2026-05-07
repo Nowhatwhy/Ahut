@@ -12,4 +12,6 @@ public interface IUserBindingService extends IService<UserBinding> {
     List<UserBindingVO> listBindings();
 
     void saveBinding(BindingDormDTO bindingDormDTO);
+
+    void deleteBindingsByIds(List<Long> ids);
 }
