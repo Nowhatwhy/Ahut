@@ -24,7 +24,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,8 +37,10 @@ public class ChargeRecordServiceImpl extends ServiceImpl<ChargeRecordMapper, Cha
     private String chargeUrl;
     private final ChargeRecordMapper chargeRecordMapper;
     private final AhutLogin ahutLogin;
+    private final ThreadPoolExecutor pool;
     @Scheduled(cron = "0 0 21 * * ?")
     public void updateChargeRecords() {
+        log.info("开始更新电费记录");
         OkHttpClient client = ahutLogin.login();
         List<ChargeRecord> chargeRecords = listChargeRecordsFromAhut(client);
         if (!chargeRecords.isEmpty()) {
@@ -47,14 +50,6 @@ public class ChargeRecordServiceImpl extends ServiceImpl<ChargeRecordMapper, Cha
     public List<ChargeRecord> listChargeRecordsFromAhut(OkHttpClient client) {
         List<ChargeDTO> chargeDTOList = chargeRecordMapper.listChargeDTO();
         // IO 密集任务，使用线程池执行
-        ExecutorService pool = new ThreadPoolExecutor(
-                16,
-                32,
-                60,
-                TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(100),
-                new ThreadPoolExecutor.CallerRunsPolicy()
-        );
         List<Future<ChargeRecord>> futures = chargeDTOList.stream()
                 .map(dto -> pool.submit(() -> {
                     Charge charge = getChargeFromAhut(dto, client);

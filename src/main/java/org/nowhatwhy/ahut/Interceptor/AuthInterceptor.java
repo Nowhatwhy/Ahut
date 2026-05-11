@@ -27,7 +27,11 @@ public class AuthInterceptor implements HandlerInterceptor {
     private final StringRedisTemplate stringRedisTemplate;
     private final IUserService userService;
     @Override
-    public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
+    public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
+        String ip = getClientIp(request);
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+        String ua = request.getHeader("User-Agent");
         String botSecret = request.getHeader("bot-secret");
         if (botSecret != null && botSecret.equals(this.botSecret)) {
             log.info("Bot 验证成功");
@@ -41,19 +45,19 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
         String token = request.getHeader("Authorization");
         if (token == null || !token.startsWith("Bearer ")) {
+            log.warn("未登录请求 IP={} METHOD={} URI={} UA={}", ip, method, uri, ua);
             response.setStatus(401);
             response.setContentType("text/plain;charset=utf-8");
             response.getWriter().write("用户未登录");
-            log.info("用户未登录");
             return false;
         }
         token = token.substring(7);
         String key = RedisConstant.LOGIN_TOKEN + token;
         if (!stringRedisTemplate.hasKey(key)) {
+            log.warn("Token 过期 IP={} METHOD={} URI={}", ip, method, uri);
             response.setStatus(401);
             response.setContentType("text/plain;charset=utf-8");
             response.getWriter().write("用户登录信息过期");
-            log.info("用户登录信息过期");
             return false;
         }
         Map<Object, Object> userMap = stringRedisTemplate.opsForHash().entries(key);
@@ -65,7 +69,18 @@ public class AuthInterceptor implements HandlerInterceptor {
         return true;
     }
     @Override
-    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception ex) throws Exception {
+    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception ex) {
         UserHolder.remove();
+    }
+
+    /**
+     * 获取真实 IP
+     */
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip != null && !ip.isBlank() && !"unknown".equalsIgnoreCase(ip)) {
+            return ip.split(",")[0];
+        }
+        return request.getRemoteAddr();
     }
 }
